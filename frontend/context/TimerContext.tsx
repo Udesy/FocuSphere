@@ -10,7 +10,7 @@ interface TimerContextType {
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export const TimerProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedTime, setSelectedTime] = useState<number | null>(1800);
+  const [selectedTime, setSelectedTime] = useState<number | 0>(1800);
 
   return (
     <TimerContext.Provider value={{ selectedTime, setSelectedTime }}>

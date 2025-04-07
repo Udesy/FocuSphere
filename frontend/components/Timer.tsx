@@ -1,10 +1,12 @@
 "use client";
 
 import { useTimer } from "@/context/TimerContext";
+import { useSettings } from "@/context/SettingContext";
 import React, { useEffect, useState } from "react";
 
 const Timer = ({ timer }: { timer: string }) => {
   const { selectedTime } = useTimer();
+  const { clockStyle } = useSettings();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -28,11 +30,16 @@ const Timer = ({ timer }: { timer: string }) => {
   };
 
   const formatClock = () => {
-    return currentTime.toLocaleTimeString("en-GB", {
+    let time = currentTime.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false,
+      hour12: clockStyle === "12hr",
     });
+
+    if (clockStyle === "12hr") {
+      time = time.replace(/ AM| PM/, "");
+    }
+    return time;
   };
 
   return (

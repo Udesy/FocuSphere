@@ -47,7 +47,7 @@ const Theme = () => {
             selectedTheme === "Black" && "border-2 border-background"
           }`}
         />
-        <h1 className="mt-4">Minimalist Black</h1>
+        <h1 className="mt-6 text-xl text-foreground">Minimalist Black</h1>
       </div>
       <div
         className="flex flex-col w-70 h-50 justify-center items-center"
@@ -59,7 +59,7 @@ const Theme = () => {
             selectedTheme === "White" && "border-2 border-background"
           }`}
         />
-        <h1 className="mt-4">Minimalist White</h1>
+        <h1 className="mt-6 text-xl text-foreground">Minimalist White</h1>
       </div>
     </div>
   );

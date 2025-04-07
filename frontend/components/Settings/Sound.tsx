@@ -82,11 +82,13 @@ const Sound: React.FC = () => {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-xl font-semibold mb-4">🔔 Alert Sound</h1>
+      <h1 className="text-2xl font-semibold mb-4 text-white dark:text-black">
+        🔔 Alert Sound
+      </h1>
 
       {/* Volume Slider */}
       <div className="mb-6">
-        <label htmlFor="volume" className="block mb-2 text-sm text-gray-700">
+        <label htmlFor="volume" className="block mb-2 text-lg text-gray-700">
           Volume: {Math.round(volume * 100)}%
         </label>
         <input
@@ -101,7 +103,12 @@ const Sound: React.FC = () => {
         />
       </div>
 
-      <p className="mb-2 text-sm text-gray-500">Choose your sound:</p>
+      <p
+        className="mb-2 text-lg
+       text-gray-900"
+      >
+        Choose your sound:
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {soundOptions.map((option) => (
@@ -123,7 +130,9 @@ const Sound: React.FC = () => {
               className="hidden"
             />
             <span className="text-2xl">{option.icon}</span>
-            <span className="text-sm font-medium">{option.label}</span>
+            <span className="text-sm font-medium text-black">
+              {option.label}
+            </span>
           </label>
         ))}
       </div>
