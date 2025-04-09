@@ -22,7 +22,7 @@ const Selector = () => {
           className="w-[140px] p-2 bg-white/20 backdrop-blur-md rounded-full text-foreground border border-neutral-700 dark:border-white/30 cursor-pointer ml-1.5"
         >
           <option
-            value={1800}
+            value={5}
             className="bg-background selection:bg-white selection:text-black backdrop-blur-md  text-foreground w-[100px] text-xl"
           >
             30 Min

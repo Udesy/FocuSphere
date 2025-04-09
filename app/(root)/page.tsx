@@ -7,7 +7,7 @@ import Selector from "@/components/Selector";
 import Timer from "@/components/Timer";
 import { breakButton } from "@/constant";
 import { useTimer } from "@/context/TimerContext";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { motion } from "motion/react";
 
 const Home = () => {
@@ -15,9 +15,10 @@ const Home = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [hasSelected, setHasSelected] = useState(false);
   const [lastfocusTime, setLastfocusTime] = useState<number | null>(null);
-  const [intialTime, setInitialTime] = useState<number | null>(null);
+  const [initialTime, setInitialTime] = useState(0);
   const [timer, setTimer] = useState<"Home" | "Timer">("Home");
-  const userName = "Uddeshya";
+  const [sessionType, setSessionType] = useState<"focus" | "break">("focus");
+  const [totalSession, setTotalSession] = useState(0);
 
   useEffect(() => {
     if (isRunning && selectedTime !== null && selectedTime > 0) {
@@ -27,11 +28,38 @@ const Home = () => {
 
       return () => clearInterval(interval);
     }
-
-    if (selectedTime === 0) {
-      window.alert("You have completed the focus session");
+    if (selectedTime == 0 && isRunning) {
+      setIsRunning(false);
+      if (sessionType === "focus") {
+        updateLocalCount("focusSessionsToday");
+        updateTotalCount();
+        setHasSelected(false);
+        setTotalSession((prev) => prev + Number(initialTime));
+      }
+      if (sessionType === "break") {
+        updateLocalCount("breaksTakenToday");
+      }
     }
   }, [isRunning, selectedTime]);
+
+  const updateTotalCount = () => {
+    console.log(totalSession);
+    const today = new Date().toISOString().split("T")[0];
+
+    const existingData = JSON.parse(
+      localStorage.getItem("totalFocusTime") || "{}"
+    );
+    existingData[today] = totalSession;
+    localStorage.setItem("totalFocusTime", JSON.stringify(existingData));
+  };
+
+  const updateLocalCount = (key: string) => {
+    const today = new Date().toISOString().split("T")[0];
+    const existingData = JSON.parse(localStorage.getItem(key) || "{}");
+
+    existingData[today] = (existingData[today] || 0) + 1;
+    localStorage.setItem(key, JSON.stringify(existingData));
+  };
 
   const startTimer = () => {
     if (selectedTime !== null && selectedTime > 0) {
@@ -49,21 +77,14 @@ const Home = () => {
     setLastfocusTime(selectedTime);
     setSelectedTime(breakDuration);
     setIsRunning(true);
-    console.log(lastfocusTime);
+    setSessionType("break");
   };
 
   const resetTimer = () => {
-    if (intialTime !== null) {
-      setSelectedTime(intialTime);
+    if (initialTime !== null) {
+      setSelectedTime(initialTime);
       setIsRunning(false);
     }
-  };
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
   };
 
   return (
@@ -124,13 +145,6 @@ const Home = () => {
             transition={{ duration: 1, ease: "easeIn" }}
             className="pointer-events-none flex flex-col justify-center items-center md:mb-22"
           >
-            <div className=" mb-10">
-              {userName && (
-                <h1 className="text-4xl text-foreground/85">
-                  {getGreeting()}, {userName}
-                </h1>
-              )}
-            </div>
             <Timer timer={timer} />
           </motion.div>
         )}

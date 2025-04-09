@@ -1,9 +1,9 @@
 import { CircleUserRound, X } from "lucide-react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Heatmap from "./Heatmap";
-import Graph from "./Graph";
 import BarChart from "./BarChart";
 import gsap from "gsap";
+import { getUser, User } from "@/lib/user";
 
 interface StatsDialogueProps {
   setOpenStats: (open: boolean) => void;
@@ -11,6 +11,11 @@ interface StatsDialogueProps {
 
 const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
   const statRef = useRef(null);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    getUser().then((data) => setUser(data));
+  }, []);
 
   useEffect(() => {
     gsap.set(statRef.current, {
@@ -21,6 +26,9 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
       duration: 0.2,
     });
   }, []);
+
+  console.log(user);
+
   return (
     <div
       className="fixed inset-0 h-full w-full flex items-center justify-center bg-black/50 backdrop-blur-md z-50"
@@ -32,7 +40,7 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="absolute right-4 top-2 bg-background hover:bg-background/80 rounded-xl p-1.5">
-          <X onClick={() => setOpenStats(false)} color="#000000" />
+          <X onClick={() => setOpenStats(false)} />
         </div>
         <div className="flex flex-col w-full items-center gap-8 p-4 overflow-y-scroll scrollbar-track-bg-neutral-900 scrollbar-thumb-gray-800">
           <div className="flex flex-row items-center justify-between gap-[38px] w-full mt-9 text-[22px] bg-slate-300/50 rounded-xl px-4 py-7 ">
@@ -40,22 +48,34 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
               <div>
                 <CircleUserRound size={50} />
               </div>
-              <div className="flex flex-col items-center">
-                <h1>Username</h1>
-                <p className="text-[12px] text-gray-600">DD-MM-YYYY</p>
+              <div className="flex flex-col">
+                {user?.name ? (
+                  <div>
+                    <h1 className="text-2xl text-nowrap">{user?.name}</h1>
+                    <p className="text-[15px] text-gray-600">
+                      Joined {user?.firstLogin.toString().split("T")[0]}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <h1 className="text-lg text-wrap">User Not Logged In.</h1>
+                  </div>
+                )}
               </div>
             </div>
-            <div className="bg-gray-700 h-full w-1.5 rounded-full" />
+            <div className="bg-gray-700 h-full w-1.5 rounded-full flex flex-row justify-evenly" />
             <div className="flex flex-col items-center justify-center gap-3">
-              <h1>Focus started</h1>
+              <h1 className="text-center text-nowrap text-lg">Focus started</h1>
               <p className="text-3xl mt-3">00</p>
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
-              <h1>Breaks Taken</h1>
+              <h1 className="text-center text-nowrap text-lg">Breaks Taken</h1>
               <p className="text-3xl mt-3">00</p>
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
-              <h1>Total time Focused</h1>
+              <h1 className="text-center text-nowrap text-lg">
+                Total time Focused
+              </h1>
               <p className="text-3xl mt-3">00</p>
             </div>
           </div>
@@ -76,11 +96,6 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
           </div>
           <div className=" bg-slate-300/50 rounded-xl w-full">
             <Heatmap />
-          </div>
-          <div className="flex flex-row gap-5">
-            <div className="">
-              <Graph />
-            </div>
           </div>
         </div>
       </div>
