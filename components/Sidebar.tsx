@@ -18,7 +18,7 @@ const Sidebar = ({
   selectedOption: string;
 }) => {
   return (
-    <div className="bg-foreground text-background p-6 shadow-lg w-50 h-full relative left-0 top-0">
+    <div className="bg-foreground text-background p-6 shadow-lg w-fit md:w-50 h-full relative left-0 top-0">
       <ul className="mt-5 space-y-2">
         <SidebarItem
           icon={<Sun size={25} />}
@@ -81,7 +81,7 @@ const SidebarItem = ({
     onClick={onClick}
   >
     {icon}
-    <span>{label}</span>
+    <span className="hidden sm:block">{label}</span>
   </li>
 );
 

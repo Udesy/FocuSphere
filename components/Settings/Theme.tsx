@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "motion/react";
 
 const THEME_KEY = "selectedTheme";
 
 const Theme = () => {
   const [selectedTheme, setSelectedTheme] = useState<"Black" | "White">(
-    "White"
+    "Black"
   );
 
   useEffect(() => {
@@ -36,7 +37,12 @@ const Theme = () => {
   };
 
   return (
-    <div className="flex flex-row gap-8 cursor-pointer">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeIn" }}
+      className="flex flex-col md:flex-row gap-8 cursor-pointer p-6 space-y-6 max-sm:items-center"
+    >
       <div
         className="flex flex-col w-70 h-50  justify-center items-center"
         onClick={() => handleThemeChange("Black")}
@@ -61,7 +67,7 @@ const Theme = () => {
         />
         <h1 className="mt-6 text-xl text-foreground">Minimalist White</h1>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

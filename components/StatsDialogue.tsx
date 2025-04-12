@@ -3,18 +3,75 @@ import React, { useEffect, useRef, useState } from "react";
 import Heatmap from "./Heatmap";
 import BarChart from "./BarChart";
 import gsap from "gsap";
-import { getUser, User } from "@/lib/user";
+import { useSession } from "next-auth/react";
+import moment from "moment";
 
 interface StatsDialogueProps {
   setOpenStats: (open: boolean) => void;
 }
 
+interface UserData {
+  name: string;
+  focusSessions: object;
+}
+
 const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
   const statRef = useRef(null);
-  const [user, setUser] = useState<User | null>(null);
+  const { data: session } = useSession();
+  const [data, setData] = useState<UserData | null>(null);
+  const [focusSessions, setFocusSessions] = useState(0);
+  const [breaksTaken, setBreaksTaken] = useState(0);
+  const [totalFocus, setTotalFocus] = useState(0);
+  const [totalWeekFocus, setTotalWeekFocus] = useState(0);
+  const [averageWeekFocus, setAverageWeekFocus] = useState(0);
 
   useEffect(() => {
-    getUser().then((data) => setUser(data));
+    if (!data?.focusSessions) return;
+
+    const focusData = data.focusSessions as Record<string, number>;
+    const last7Days = Array.from({ length: 7 }).map((_, i) =>
+      moment()
+        .subtract(6 - i, "days")
+        .format("YYYY-MM-DD")
+    );
+
+    let totalSeconds = 0;
+    last7Days.forEach((dateStr) => {
+      totalSeconds += focusData[dateStr] || 0;
+    });
+
+    const totalHours = totalSeconds / 3600;
+    const averageHours = totalHours / 7;
+
+    setTotalWeekFocus(totalHours);
+    setAverageWeekFocus(averageHours);
+  }, [data?.focusSessions]);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch("/api/user")
+        .then((res) => res.json())
+        .then((data) => setData(data))
+        .catch((err) => console.error("Failed to fetch stats:", err));
+    }
+  }, [session]);
+
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+
+    const sessionData = JSON.parse(
+      localStorage.getItem("focusSessionsToday") || "{}"
+    );
+    const breaksData = JSON.parse(
+      localStorage.getItem("breaksTakenToday") || "{}"
+    );
+    const focusTimeData = JSON.parse(
+      localStorage.getItem("totalFocusTime") || "{}"
+    );
+
+    setFocusSessions(sessionData[today] || 0);
+    setBreaksTaken(breaksData[today] || 0);
+    setTotalFocus(Math.floor((focusTimeData[today] || 0) / 60)); // convert seconds to minutes
   }, []);
 
   useEffect(() => {
@@ -27,7 +84,7 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
     });
   }, []);
 
-  console.log(user);
+  console.log(data);
 
   return (
     <div
@@ -49,11 +106,11 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
                 <CircleUserRound size={50} />
               </div>
               <div className="flex flex-col">
-                {user?.name ? (
+                {data?.name ? (
                   <div>
-                    <h1 className="text-2xl text-nowrap">{user?.name}</h1>
+                    <h1 className="text-2xl text-nowrap">{data?.name}</h1>
                     <p className="text-[15px] text-gray-600">
-                      Joined {user?.firstLogin.toString().split("T")[0]}
+                      Joined {data?.firstLogin.toString().split("T")[0]}
                     </p>
                   </div>
                 ) : (
@@ -66,36 +123,42 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
             <div className="bg-gray-700 h-full w-1.5 rounded-full flex flex-row justify-evenly" />
             <div className="flex flex-col items-center justify-center gap-3">
               <h1 className="text-center text-nowrap text-lg">Focus started</h1>
-              <p className="text-3xl mt-3">00</p>
+              <p className="text-3xl mt-3">{focusSessions}</p>
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
               <h1 className="text-center text-nowrap text-lg">Breaks Taken</h1>
-              <p className="text-3xl mt-3">00</p>
+              <p className="text-3xl mt-3">{breaksTaken}</p>
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
               <h1 className="text-center text-nowrap text-lg">
                 Total time Focused
               </h1>
-              <p className="text-3xl mt-3">00</p>
+              <p className="text-3xl mt-3">{totalFocus} min</p>
             </div>
           </div>
           <div className="flex flex-row gap-5">
             <div className="rounded-xl bg-slate-300/50">
-              <BarChart />
+              <BarChart focusSessions={data?.focusSessions} />
             </div>
             <div className="w-[300px] h-[280px] rounded-xl flex flex-col items-center justify-evenly bg-slate-300/50">
               <div className="flex flex-col items-center justify-center">
                 <h1 className="text-xl">Total Focus this Week</h1>
-                <p className="mt-4 text-3xl">00</p>
+                <p className="mt-4 text-3xl">{`${Math.floor(
+                  totalWeekFocus
+                )}h ${Math.round(
+                  (totalWeekFocus - Math.floor(totalWeekFocus)) * 60
+                )}min`}</p>
               </div>
               <div className="flex flex-col items-center justify-center">
-                <h1 className="text-xl">Best Focus Time</h1>
-                <p className="mt-4 text-3xl">00</p>
+                <h1 className="text-xl">Average Focus Time</h1>
+                <p className="mt-4 text-3xl">{`${(totalWeekFocus / 7).toFixed(
+                  1
+                )}h`}</p>
               </div>
             </div>
           </div>
           <div className=" bg-slate-300/50 rounded-xl w-full">
-            <Heatmap />
+            <Heatmap data={data?.focusSessions} />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import React, {
 } from "react";
 
 type ClockStyle = "24hr" | "12hr";
-type GreetingStyle = "normal" | "emerge";
+type GreetingStyle = "normal" | "emerge" | "none";
 
 type SettingsContextType = {
   clockStyle: ClockStyle;

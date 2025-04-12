@@ -11,11 +11,10 @@ const UserSchema = new Schema(
       default: () => new Date().toISOString().split("T")[0],
     },
     focusSessions: {
-      type: Map,
+      type: Object,
       of: Number,
       default: {},
     },
-    totalFocusTime: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

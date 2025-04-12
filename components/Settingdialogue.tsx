@@ -6,8 +6,8 @@ import Clock from "./Settings/Clock";
 import Greetings from "./Settings/Greetings";
 import Sound from "./Settings/Sound";
 import Profile from "./Settings/Profile";
-import SupportandFeedback from "./Settings/SupportandFeedback";
 import gsap from "gsap";
+import Support from "./Settings/Support";
 
 interface SettingDialogueProps {
   setOpenSetting: (open: boolean) => void;
@@ -33,7 +33,7 @@ const SettingDialogue: React.FC<SettingDialogueProps> = ({
       id="setting"
     >
       <div
-        className="relative bg-slate-300/50 border border-black w-[1000px] h-[680px] flex rounded-xl overflow-hidden"
+        className="relative bg-white/40 border border-black w-[1000px] h-[680px] flex rounded-xl overflow-x-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -48,13 +48,13 @@ const SettingDialogue: React.FC<SettingDialogueProps> = ({
           setSelectedOption={setSelectedOption}
           selectedOption={selectedOption}
         />
-        <main className="flex-1 p-10">
+        <main className="flex-1 p-10 overflow-y-auto">
           {selectedOption === "Theme" && <Theme />}
           {selectedOption === "Clock" && <Clock />}
           {selectedOption === "Greeting" && <Greetings />}
           {selectedOption === "Sound" && <Sound />}
           {selectedOption === "Profile" && <Profile />}
-          {selectedOption === "Support" && <SupportandFeedback />}
+          {selectedOption === "Support" && <Support />}
         </main>
       </div>
     </div>

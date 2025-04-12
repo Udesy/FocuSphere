@@ -7,18 +7,22 @@ import Selector from "@/components/Selector";
 import Timer from "@/components/Timer";
 import { breakButton } from "@/constant";
 import { useTimer } from "@/context/TimerContext";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
+import { useSession } from "next-auth/react";
+import Greetings from "@/components/Greetings";
+import { useSettings } from "@/context/SettingContext";
 
 const Home = () => {
   const { selectedTime, setSelectedTime } = useTimer();
   const [isRunning, setIsRunning] = useState(false);
   const [hasSelected, setHasSelected] = useState(false);
   const [lastfocusTime, setLastfocusTime] = useState<number | null>(null);
-  const [initialTime, setInitialTime] = useState(0);
   const [timer, setTimer] = useState<"Home" | "Timer">("Home");
   const [sessionType, setSessionType] = useState<"focus" | "break">("focus");
-  const [totalSession, setTotalSession] = useState(0);
+  const initialFocusTime = useRef<number | null>(null);
+  const { data: session } = useSession();
+  const { selectedSound, volume } = useSettings();
 
   useEffect(() => {
     if (isRunning && selectedTime !== null && selectedTime > 0) {
@@ -28,44 +32,107 @@ const Home = () => {
 
       return () => clearInterval(interval);
     }
-    if (selectedTime == 0 && isRunning) {
+
+    if (selectedTime === 0 && isRunning) {
       setIsRunning(false);
+      playSound(selectedSound, volume);
+
       if (sessionType === "focus") {
         updateLocalCount("focusSessionsToday");
-        updateTotalCount();
+        updateTotalFocusTime();
         setHasSelected(false);
-        setTotalSession((prev) => prev + Number(initialTime));
       }
+
       if (sessionType === "break") {
         updateLocalCount("breaksTakenToday");
+
+        // Restore focus session and auto-resume it
+        if (lastfocusTime !== null) {
+          setSelectedTime(lastfocusTime);
+          setSessionType("focus");
+          setIsRunning(true); // auto resume
+          setHasSelected(true); // keep break buttons visible
+        }
       }
     }
   }, [isRunning, selectedTime]);
 
-  const updateTotalCount = () => {
-    console.log(totalSession);
+  const playSound = (selectedSound: string, volume: number = 1) => {
+    const audio = new Audio(`/sounds/${selectedSound}.mp3`);
+    audio.volume = volume;
+    audio.play().catch((e) => console.error("Failed to play sound:", e));
+  };
+
+  const resetData = () => {
     const today = new Date().toISOString().split("T")[0];
+    const lastUpdated = localStorage.getItem("lastUpdated");
+
+    if (lastUpdated !== today) {
+      // Reset localStorage for a new day
+      localStorage.setItem(
+        "focusSessionsToday",
+        JSON.stringify({ [today]: 0 })
+      );
+      localStorage.setItem("breaksTakenToday", JSON.stringify({ [today]: 0 }));
+
+      const totalFocusTime = JSON.parse(
+        localStorage.getItem("totalFocusTime") || "{}"
+      );
+      totalFocusTime[today] = 0;
+      localStorage.setItem("totalFocusTime", JSON.stringify(totalFocusTime));
+
+      localStorage.setItem("lastUpdated", today);
+    }
+  };
+
+  const updateTotalFocusTime = async () => {
+    resetData();
+    const today = new Date().toISOString().split("T")[0];
+    const sessionTime = initialFocusTime.current ?? 0;
 
     const existingData = JSON.parse(
       localStorage.getItem("totalFocusTime") || "{}"
     );
-    existingData[today] = totalSession;
+
+    const previousTime = Number(existingData[today]) || 0;
+    existingData[today] = Number(previousTime) + Number(sessionTime);
+
     localStorage.setItem("totalFocusTime", JSON.stringify(existingData));
+
+    if (!session) return;
+
+    try {
+      const res = await fetch("/api/focussession", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: today, sessionTime }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to sync with backend");
+      }
+    } catch (err) {
+      console.error("Sync with MongoDB failed:", err);
+    }
   };
 
   const updateLocalCount = (key: string) => {
+    resetData();
     const today = new Date().toISOString().split("T")[0];
     const existingData = JSON.parse(localStorage.getItem(key) || "{}");
 
-    existingData[today] = (existingData[today] || 0) + 1;
+    existingData[today] = Number(existingData[today] || 0) + 1;
     localStorage.setItem(key, JSON.stringify(existingData));
   };
 
   const startTimer = () => {
     if (selectedTime !== null && selectedTime > 0) {
-      setInitialTime(selectedTime);
+      if (!hasSelected) {
+        initialFocusTime.current = selectedTime;
+        setHasSelected(true);
+      }
       setIsRunning(true);
-      setHasSelected(true);
     }
   };
 
@@ -81,8 +148,8 @@ const Home = () => {
   };
 
   const resetTimer = () => {
-    if (initialTime !== null) {
-      setSelectedTime(initialTime);
+    if (initialFocusTime.current !== null) {
+      setSelectedTime(initialFocusTime.current);
       setIsRunning(false);
     }
   };
@@ -111,7 +178,7 @@ const Home = () => {
                     key={id}
                     text={text}
                     handleClick={() => breakTime(value)}
-                    className=" md:w-[10rem] md:text-[1.28rem] text-[0.9rem]"
+                    className="md:w-[10rem] md:text-[1.28rem] text-[0.9rem]"
                   />
                 ))}
               </div>
@@ -120,10 +187,10 @@ const Home = () => {
               <Timer timer={timer} />
             </div>
             <div className="flex flex-col gap-5 items-center justify-center mt-5">
-              <div>{hasSelected !== true && <Selector />}</div>
-              <div className="flex flex-row md:gap-8 gap-2 ">
+              <div>{!hasSelected && <Selector />}</div>
+              <div className="flex flex-row md:gap-8 gap-2">
                 <Button
-                  text={isRunning === false ? "Start" : "Pause"}
+                  text={isRunning ? "Pause" : "Start"}
                   handleClick={isRunning ? pauseTimer : startTimer}
                   className="md:text-[1.5rem] lg:w-[12rem] md:w-[10rem] max-md:w-[7rem]"
                 />
@@ -139,12 +206,13 @@ const Home = () => {
           </motion.div>
         ) : (
           <motion.div
-            key={"home-timer"}
+            key="home-timer"
             initial={{ opacity: 0, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: "easeIn" }}
             className="pointer-events-none flex flex-col justify-center items-center md:mb-22"
           >
+            <Greetings />
             <Timer timer={timer} />
           </motion.div>
         )}

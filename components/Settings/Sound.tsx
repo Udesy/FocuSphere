@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
+import { useSettings } from "@/context/SettingContext";
+import { motion } from "motion/react";
 
 type SoundOption = {
   id: string;
@@ -35,25 +37,13 @@ const soundOptions: SoundOption[] = [
   { id: "none", label: "No Alert", icon: "🔕", file: "" },
 ];
 
-const LOCAL_STORAGE_SOUND_KEY = "selectedAlertSound";
-const LOCAL_STORAGE_VOLUME_KEY = "notificationVolume";
-
 const Sound: React.FC = () => {
-  const [selectedSound, setSelectedSound] = useState<string>("");
-  const [volume, setVolume] = useState<number>(0.5);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    const savedSound = localStorage.getItem(LOCAL_STORAGE_SOUND_KEY);
-    if (savedSound) setSelectedSound(savedSound);
-
-    const savedVolume = localStorage.getItem(LOCAL_STORAGE_VOLUME_KEY);
-    if (savedVolume) setVolume(parseFloat(savedVolume));
-  }, []);
+  const { selectedSound, setSelectedSound, volume, setVolume } = useSettings();
 
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
-    localStorage.setItem(LOCAL_STORAGE_VOLUME_KEY, newVolume.toString());
 
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
@@ -63,7 +53,6 @@ const Sound: React.FC = () => {
 
   const handleChange = (soundId: string, file: string) => {
     setSelectedSound(soundId);
-    localStorage.setItem(LOCAL_STORAGE_SOUND_KEY, soundId);
 
     if (audioRef.current) {
       audioRef.current.pause();
@@ -81,14 +70,14 @@ const Sound: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4 text-white dark:text-black">
-        🔔 Alert Sound
-      </h1>
-
-      {/* Volume Slider */}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeIn" }}
+      className="p-6 max-w-2xl mx-auto"
+    >
       <div className="mb-6">
-        <label htmlFor="volume" className="block mb-2 text-lg text-gray-700">
+        <label htmlFor="volume" className="block mb-2 text-2xl text-foreground">
           Volume: {Math.round(volume * 100)}%
         </label>
         <input
@@ -99,18 +88,13 @@ const Sound: React.FC = () => {
           step={0.01}
           value={volume}
           onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
-          className="w-[200px] h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          className="w-[200px] h-2 bg-background/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
         />
       </div>
 
-      <p
-        className="mb-2 text-lg
-       text-gray-900"
-      >
-        Choose your sound:
-      </p>
+      <p className="mb-2 text-lg text-foreground">Choose your sound:</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
         {soundOptions.map((option) => (
           <label
             key={option.id}
@@ -118,7 +102,7 @@ const Sound: React.FC = () => {
               ${
                 selectedSound === option.id
                   ? "border-purple-600 bg-purple-100"
-                  : "border-gray-300 hover:bg-gray-50"
+                  : "border-gray-500/80 hover:bg-background/25"
               }`}
           >
             <input
@@ -130,13 +114,13 @@ const Sound: React.FC = () => {
               className="hidden"
             />
             <span className="text-2xl">{option.icon}</span>
-            <span className="text-sm font-medium text-black">
+            <span className="text-[15px] font-medium text-black">
               {option.label}
             </span>
           </label>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

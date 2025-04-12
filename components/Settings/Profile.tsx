@@ -2,6 +2,7 @@
 
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { motion } from "motion/react";
 
 const GoogleSvg = ({ size }: { size?: number }) => {
   return (
@@ -123,54 +124,60 @@ const Profile = () => {
   const { data: session } = useSession();
 
   return (
-    <div>
-      <div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1, ease: "easeIn" }}
+    >
+      <div className="p-7">
         {!session?.user ? (
-          <div>
-            <h1>Not Signed Up Yet?</h1> <br />
-            <h1>Sign Up to get acess to Stats and Monitor Daily Progress.</h1>
+          <div className="p-6">
+            <div>
+              <h1 className="text-3xl">Not Signed Up Yet?</h1> <br />
+              <h1>Sign Up to get acess to Stats and Monitor Daily Progress.</h1>
+            </div>
+            <div className="space-y-4 mt-[50px]">
+              <div className="flex flex-row border border-gray-500 p-4 rounded-lg w-fit transition-colors hover:bg-background/20 cursor-pointer dark:text-gray-200">
+                <button
+                  onClick={() => signIn("google")}
+                  className="flex flex-row gap-4 cursor-pointer"
+                >
+                  <GoogleSvg size={24} />
+                  Sign In with Google
+                </button>
+              </div>
+              <div className="border border-gray-500 p-4 rounded-lg w-fit transition-colors hover:bg-background/20 cursor-pointer dark:text-gray-200">
+                <button
+                  onClick={() => signIn("github")}
+                  className="flex flex-row gap-4 cursor-pointer"
+                >
+                  <GithubSvg size={24} />
+                  Sign In with Github
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
-          <div>
-            <h1>{`Hello ${session.user.name?.split(" ")[0]} `}</h1>
+          <div className="p-6 flex flex-col gap-10">
+            <div>
+              <h1 className="text-2xl">{`Hello ${
+                session.user.name?.split(" ")[0]
+              } 👋`}</h1>
+              <p className="mt-3">Sign out from your session here.</p>
+            </div>
+            <div className="border border-gray-500 p-4 rounded-lg w-fit transition-colors hover:bg-background/20 cursor-pointer dark:text-gray-200 px-8">
+              <button
+                onClick={() => signOut()}
+                className="flex flex-row gap-2 cursor-pointer"
+              >
+                <SignOutSvg size={24} />
+                Sign Out
+              </button>
+            </div>
           </div>
         )}
       </div>
-      <div className="flex flex-col items-center justify-center">
-        {session?.user ? (
-          <div className="flex flex-row border border-white p-3 rounded-lg">
-            <button
-              onClick={() => signOut()}
-              className="flex flex-row gap-2 cursor-pointer"
-            >
-              <SignOutSvg size={24} />
-              Sign Out
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex flex-row border border-white p-3 rounded-lg">
-              <button
-                onClick={() => signIn("google")}
-                className="flex flex-row gap-2 cursor-pointer"
-              >
-                <GoogleSvg size={24} />
-                Sign In with Google
-              </button>
-            </div>
-            <div className="border border-white p-3 rounded-lg">
-              <button
-                onClick={() => signIn("github")}
-                className="flex flex-row gap-2 cursor-pointer"
-              >
-                <GithubSvg size={24} />
-                Sign In with Github
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    </motion.div>
   );
 };
 
