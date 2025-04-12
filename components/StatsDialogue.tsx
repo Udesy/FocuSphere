@@ -10,9 +10,14 @@ interface StatsDialogueProps {
   setOpenStats: (open: boolean) => void;
 }
 
+interface FocusSessionsData {
+  [date: string]: number;
+}
+
 interface UserData {
   name: string;
-  focusSessions: object;
+  focusSessions: FocusSessionsData;
+  firstLogin: string;
 }
 
 const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
@@ -135,7 +140,7 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
           </div>
           <div className="flex flex-row gap-5">
             <div className="rounded-xl bg-slate-300/50">
-              <BarChart focusSessions={data?.focusSessions} />
+              <BarChart focusSessions={data?.focusSessions || {}} />
             </div>
             <div className="w-[300px] h-[280px] rounded-xl flex flex-col items-center justify-evenly bg-slate-300/50">
               <div className="flex flex-col items-center justify-center">
@@ -155,7 +160,7 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
             </div>
           </div>
           <div className=" bg-slate-300/50 rounded-xl w-full">
-            <Heatmap data={data?.focusSessions} />
+            <Heatmap data={data?.focusSessions || {}} />
           </div>
         </div>
       </div>

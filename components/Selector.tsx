@@ -6,8 +6,8 @@ import React from "react";
 
 const Selector = () => {
   const { selectedTime, setSelectedTime } = useTimer();
-  const handleClick = (e) => {
-    setSelectedTime(e.target.value);
+  const handleClick = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTime(Number(e.target.value));
   };
 
   return (
