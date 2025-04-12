@@ -3,14 +3,14 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface TimerContextType {
-  selectedTime: number | null;
+  selectedTime: number;
   setSelectedTime: (time: number) => void;
 }
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
 
 export const TimerProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedTime, setSelectedTime] = useState<number | 0>(1800);
+  const [selectedTime, setSelectedTime] = useState<number>(1800);
 
   return (
     <TimerContext.Provider value={{ selectedTime, setSelectedTime }}>

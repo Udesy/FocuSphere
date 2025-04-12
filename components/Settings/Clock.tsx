@@ -20,6 +20,8 @@ const Clock = () => {
         <Image
           alt="12Hr"
           src="/12-Hour.jpg"
+          width={1000}
+          height={600}
           className={`w-full h-full object-cover rounded-xl ${
             clockStyle === "12hr" ? "border-2 border-white" : ""
           }`}
@@ -35,6 +37,8 @@ const Clock = () => {
         <Image
           alt="24Hr"
           src="/24-Hour.jpg"
+          width={1000}
+          height={600}
           className={`w-full h-full object-cover rounded-xl ${
             clockStyle === "24hr" ? "border-2 border-white" : ""
           }`}

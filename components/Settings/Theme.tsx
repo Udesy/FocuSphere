@@ -51,6 +51,8 @@ const Theme = () => {
         <Image
           alt="Black theme"
           src="/Black.jpg"
+          width={1000}
+          height={600}
           className={`w-full h-full object-cover rounded-xl ${
             selectedTheme === "Black" && "border-2 border-background"
           }`}
@@ -64,6 +66,8 @@ const Theme = () => {
         <Image
           alt="White theme"
           src="/White.jpg"
+          width={1000}
+          height={600}
           className={`w-full h-full object-cover rounded-xl ${
             selectedTheme === "White" && "border-2 border-background"
           }`}
