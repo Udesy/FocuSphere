@@ -1,10 +1,4 @@
-import {
-  ChartBar,
-  ChartColumnBig,
-  Github,
-  Settings,
-  Share,
-} from "lucide-react";
+import { ChartColumnBig, Github, Settings, Share } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import SettingDialogue from "./Settingdialogue";

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
 
 const THEME_KEY = "selectedTheme";
 
@@ -47,7 +48,8 @@ const Theme = () => {
         className="flex flex-col w-70 h-50  justify-center items-center"
         onClick={() => handleThemeChange("Black")}
       >
-        <img
+        <Image
+          alt="Black theme"
           src="/Black.jpg"
           className={`w-full h-full object-cover rounded-xl ${
             selectedTheme === "Black" && "border-2 border-background"
@@ -59,7 +61,8 @@ const Theme = () => {
         className="flex flex-col w-70 h-50 justify-center items-center"
         onClick={() => handleThemeChange("White")}
       >
-        <img
+        <Image
+          alt="White theme"
           src="/White.jpg"
           className={`w-full h-full object-cover rounded-xl ${
             selectedTheme === "White" && "border-2 border-background"

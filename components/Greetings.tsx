@@ -33,7 +33,7 @@ const Greetings: React.FC = () => {
     const hour = new Date().getHours();
 
     if (greetingStyle === "emerge") {
-      let timeOfDay: "morning" | "afternoon" | "evening" =
+      const timeOfDay: "morning" | "afternoon" | "evening" =
         hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
 
       const greetings = emergeGreetings[timeOfDay];

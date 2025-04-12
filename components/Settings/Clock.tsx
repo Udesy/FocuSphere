@@ -1,6 +1,7 @@
 import { useSettings } from "@/context/SettingContext";
 import React from "react";
 import { motion } from "motion/react";
+import Image from "next/image";
 
 const Clock = () => {
   const { clockStyle, setClockStyle } = useSettings();
@@ -16,7 +17,8 @@ const Clock = () => {
         className="flex flex-col w-70 h-50  justify-center items-center"
         onClick={() => setClockStyle("12hr")}
       >
-        <img
+        <Image
+          alt="12Hr"
           src="/12-Hour.jpg"
           className={`w-full h-full object-cover rounded-xl ${
             clockStyle === "12hr" ? "border-2 border-white" : ""
@@ -30,7 +32,8 @@ const Clock = () => {
         className="flex flex-col w-70 h-50 justify-center items-center"
         onClick={() => setClockStyle("24hr")}
       >
-        <img
+        <Image
+          alt="24Hr"
           src="/24-Hour.jpg"
           className={`w-full h-full object-cover rounded-xl ${
             clockStyle === "24hr" ? "border-2 border-white" : ""

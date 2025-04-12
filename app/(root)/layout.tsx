@@ -4,11 +4,12 @@ import React from "react";
 import { TimerProvider } from "@/context/TimerContext";
 import { SettingsProvider } from "@/context/SettingContext";
 import { SessionProvider } from "next-auth/react";
+import { Session } from "next-auth";
 
 export default function Layout({
   children,
   session,
-}: Readonly<{ children: React.ReactNode; session: any }>) {
+}: Readonly<{ children: React.ReactNode; session: Session | null }>) {
   return (
     <main className="font-dayone">
       <SessionProvider session={session}>

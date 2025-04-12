@@ -68,7 +68,6 @@ const Home = () => {
     const lastUpdated = localStorage.getItem("lastUpdated");
 
     if (lastUpdated !== today) {
-      // Reset localStorage for a new day
       localStorage.setItem(
         "focusSessionsToday",
         JSON.stringify({ [today]: 0 })

@@ -23,7 +23,6 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
   const [breaksTaken, setBreaksTaken] = useState(0);
   const [totalFocus, setTotalFocus] = useState(0);
   const [totalWeekFocus, setTotalWeekFocus] = useState(0);
-  const [averageWeekFocus, setAverageWeekFocus] = useState(0);
 
   useEffect(() => {
     if (!data?.focusSessions) return;
@@ -41,10 +40,8 @@ const StatsDialogue: React.FC<StatsDialogueProps> = ({ setOpenStats }) => {
     });
 
     const totalHours = totalSeconds / 3600;
-    const averageHours = totalHours / 7;
 
     setTotalWeekFocus(totalHours);
-    setAverageWeekFocus(averageHours);
   }, [data?.focusSessions]);
 
   useEffect(() => {
