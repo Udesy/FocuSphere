@@ -30,9 +30,7 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 );
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [clockStyle, setClockStyle] = useState<"12-Hour" | "24-Hour">(
-    "24-Hour"
-  );
+  const [clockStyle, setClockStyle] = useState<"12hr" | "24hr">("24hr");
   const [greetingStyle, setGreetingStyle] = useState<GreetingStyle>("normal");
   const [selectedSound, setSelectedSound] = useState<string>("sparkle");
   const [volume, setVolume] = useState<number>(0.5);
