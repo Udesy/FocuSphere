@@ -1,17 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Days+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
 @import "tailwindcss";
-/* @import "tw-animate-css"; */
+
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-audio: "Audiowide", sans-serif;
   --font-dayone: "Days One", sans-serif;
-  --font-zendost: "Zen Dots", sans-serif;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -132,6 +128,6 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-dayone
   }
 }
