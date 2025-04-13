@@ -390,7 +390,7 @@ const Heatmap: React.FC<HeatmapProps> = ({ data = {} }) => {
         <span className="text-[12px]">more</span>
       </div>
 
-      <div className="w-[940px] flex justify-center">
+      <div className="w-[940px] flex justify-center overflow-hidden">
         <Timeline range={dateRange} data={data} />
       </div>
     </div>
